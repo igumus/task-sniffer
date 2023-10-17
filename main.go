@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+)
 
 func main() {
-	fmt.Println("hello, world")
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+
+	log.Print("hello world")
 }
