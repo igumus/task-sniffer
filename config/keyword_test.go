@@ -66,6 +66,24 @@ func TestKeywordMatch(t *testing.T) {
 				{value: "// ToxDooooooo: item2", shouldMatch: false},
 			},
 		},
+		{
+			name: "fixme",
+			inputs: []struct {
+				value       string
+				result      string
+				shouldMatch bool
+			}{
+				{value: "// fixme: item0", shouldMatch: true, result: "item0"},
+				{value: "// FixMe: item1", shouldMatch: true, result: "item1"},
+				{value: "// Fixmeeee: item2", shouldMatch: true, result: "item2"},
+				{value: "// FixmE item3", shouldMatch: true, result: "item3"},
+				{value: "// Fixme:", shouldMatch: true, result: ""},
+				{value: "//fixme:item4", shouldMatch: true, result: "item4"},
+				{value: "# FixMe:item5", shouldMatch: true, result: "item5"},
+				{value: "-- fixMe:item6", shouldMatch: true, result: "item6"},
+				{value: "// fixoMe: item2", shouldMatch: false},
+			},
+		},
 	}
 
 	var keyword *Keyword
