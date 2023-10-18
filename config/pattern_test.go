@@ -30,18 +30,21 @@ func TestKeywordRegexString(t *testing.T) {
 		},
 	}
 
-	var keyword *Keyword
+	var keyword *Pattern
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			keyword = NewKeyword(tc.name)
+			keyword = newKeyword(tc.name)
 			require.Equal(t, keyword.buildRegexString(), tc.expected)
 		})
 	}
 }
 
 func TestKeywordMatch(t *testing.T) {
+	Keyword_Todo := newKeyword("todo")
+	Keyword_Fixme := newKeyword("fixme")
+
 	testcases := []struct {
-		name   string
+		kw     *Pattern
 		inputs []struct {
 			value       string
 			result      string
@@ -49,7 +52,7 @@ func TestKeywordMatch(t *testing.T) {
 		}
 	}{
 		{
-			name: "todo",
+			kw: Keyword_Todo,
 			inputs: []struct {
 				value       string
 				result      string
@@ -67,7 +70,7 @@ func TestKeywordMatch(t *testing.T) {
 			},
 		},
 		{
-			name: "fixme",
+			kw: Keyword_Fixme,
 			inputs: []struct {
 				value       string
 				result      string
@@ -86,12 +89,10 @@ func TestKeywordMatch(t *testing.T) {
 		},
 	}
 
-	var keyword *Keyword
 	for _, tc := range testcases {
-		t.Run(tc.name, func(t *testing.T) {
-			keyword = NewKeyword(tc.name)
+		t.Run(tc.kw.name, func(t *testing.T) {
 			for _, input := range tc.inputs {
-				groups := keyword.Match(input.value)
+				groups := tc.kw.Match(input.value)
 				hasmatch := len(groups) > 0
 				require.Equal(t, input.shouldMatch, hasmatch)
 				if hasmatch {
