@@ -1,4 +1,4 @@
-module github.com/igumus/todo-sniffer
+module github.com/igumus/task-sniffer
 
 go 1.21
 
