@@ -23,6 +23,7 @@ type ConfigOption func(*config)
 type Config interface {
 	Keywords() []Pattern
 	Exclusions() []Pattern
+	Exclude(string)
 }
 
 func Load() Config {
@@ -36,6 +37,10 @@ type config struct {
 
 func (c *config) Keywords() []Pattern {
 	return c.keywords
+}
+
+func (c *config) Exclude(name string) {
+	c.exclusions = append(c.exclusions, newExclusion(name))
 }
 
 func (c *config) Exclusions() []Pattern {
