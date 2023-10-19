@@ -6,45 +6,81 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestKeywordRegexString(t *testing.T) {
+func TestPatternRegexStringGeneration(t *testing.T) {
 	testcases := []struct {
 		name     string
+		kind     patternKind
 		expected string
 	}{
 
 		{
 			name:     "todo",
+			kind:     keyword,
 			expected: "^(.*[tT]+[oO]+[dD]+[oO]+)([: ]*)*(.*)$",
 		},
 		{
 			name:     "Todo",
+			kind:     keyword,
 			expected: "^(.*[Tt]+[oO]+[dD]+[oO]+)([: ]*)*(.*)$",
 		},
 		{
 			name:     "fixme",
+			kind:     keyword,
 			expected: "^(.*[fF]+[iI]+[xX]+[mM]+[eE]+)([: ]*)*(.*)$",
 		},
 		{
 			name:     "FixMe",
+			kind:     keyword,
 			expected: "^(.*[Ff]+[iI]+[xX]+[Mm]+[eE]+)([: ]*)*(.*)$",
+		},
+		{
+			name:     ".gitignore",
+			kind:     exclusion,
+			expected: "^.gitignore$",
 		},
 	}
 
-	var keyword *Pattern
+	var kw *pattern
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			keyword = newKeyword(tc.name)
-			require.Equal(t, keyword.buildRegexString(), tc.expected)
+			kw = newPattern(tc.kind, tc.name)
+			require.Equal(t, kw.buildRegexString(), tc.expected)
+		})
+	}
+}
+
+func TestExclusionMatch(t *testing.T) {
+	testcases := []struct {
+		kw          Pattern
+		input       string
+		result      string
+		shouldMatch bool
+	}{
+		{kw: Exclusion_GitIgnore, input: "", result: "", shouldMatch: false},
+		{kw: Exclusion_GitIgnore, input: ".gitignore", result: ".gitignore", shouldMatch: true},
+		{kw: Exclusion_GitIgnore, input: ".itignore", result: "", shouldMatch: false},
+		{kw: Exclusion_Makefile, input: "", result: "", shouldMatch: false},
+		{kw: Exclusion_Makefile, input: "Makefile", result: "Makefile", shouldMatch: true},
+		{kw: Exclusion_Makefile, input: "Makeflie", result: "", shouldMatch: false},
+		{kw: Exclusion_Makefile, input: "makefile", result: "", shouldMatch: false},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.kw.Name(), func(t *testing.T) {
+			ret := tc.kw.Match(tc.input)
+			if tc.shouldMatch {
+				require.Greater(t, len(ret), 0)
+				require.Equal(t, tc.result, ret[0])
+			} else {
+				require.Equal(t, len(ret), 0)
+			}
 		})
 	}
 }
 
 func TestKeywordMatch(t *testing.T) {
-	Keyword_Todo := newKeyword("todo")
-	Keyword_Fixme := newKeyword("fixme")
-
 	testcases := []struct {
-		kw     *Pattern
+		kw     Pattern
 		inputs []struct {
 			value       string
 			result      string
@@ -90,7 +126,7 @@ func TestKeywordMatch(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		t.Run(tc.kw.name, func(t *testing.T) {
+		t.Run(tc.kw.Name(), func(t *testing.T) {
 			for _, input := range tc.inputs {
 				groups := tc.kw.Match(input.value)
 				hasmatch := len(groups) > 0
