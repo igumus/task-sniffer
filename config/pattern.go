@@ -10,14 +10,6 @@ type Pattern interface {
 	Match(string) []string
 }
 
-var (
-	Keyword_Todo        Pattern = newKeyword("todo")
-	Keyword_Fixme       Pattern = newKeyword("fixme")
-	Exclusion_GitIgnore Pattern = newExclusion(".gitignore")
-	Exclusion_Makefile  Pattern = newExclusion("Makefile")
-	Exclusion_Markdown  Pattern = newExclusion("*.md")
-)
-
 type patternKind uint8
 
 const (

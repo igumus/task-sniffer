@@ -56,13 +56,13 @@ func TestExclusionMatch(t *testing.T) {
 		result      string
 		shouldMatch bool
 	}{
-		{kw: Exclusion_GitIgnore, input: "", result: "", shouldMatch: false},
-		{kw: Exclusion_GitIgnore, input: ".gitignore", result: ".gitignore", shouldMatch: true},
-		{kw: Exclusion_GitIgnore, input: ".itignore", result: "", shouldMatch: false},
-		{kw: Exclusion_Makefile, input: "", result: "", shouldMatch: false},
-		{kw: Exclusion_Makefile, input: "Makefile", result: "Makefile", shouldMatch: true},
-		{kw: Exclusion_Makefile, input: "Makeflie", result: "", shouldMatch: false},
-		{kw: Exclusion_Makefile, input: "makefile", result: "", shouldMatch: false},
+		{kw: exclusion_gitignore, input: "", result: "", shouldMatch: false},
+		{kw: exclusion_gitignore, input: ".gitignore", result: ".gitignore", shouldMatch: true},
+		{kw: exclusion_gitignore, input: ".itignore", result: "", shouldMatch: false},
+		{kw: exclusion_makefile, input: "", result: "", shouldMatch: false},
+		{kw: exclusion_makefile, input: "Makefile", result: "Makefile", shouldMatch: true},
+		{kw: exclusion_makefile, input: "Makeflie", result: "", shouldMatch: false},
+		{kw: exclusion_makefile, input: "makefile", result: "", shouldMatch: false},
 	}
 
 	for _, tc := range testcases {
@@ -88,7 +88,7 @@ func TestKeywordMatch(t *testing.T) {
 		}
 	}{
 		{
-			kw: Keyword_Todo,
+			kw: keyword_todo,
 			inputs: []struct {
 				value       string
 				result      string
@@ -106,7 +106,7 @@ func TestKeywordMatch(t *testing.T) {
 			},
 		},
 		{
-			kw: Keyword_Fixme,
+			kw: keyword_fixme,
 			inputs: []struct {
 				value       string
 				result      string
