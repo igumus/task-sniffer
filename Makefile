@@ -23,7 +23,7 @@ test-clean: build
 test-all: test-clean ## Runs all tests 
 	@go test -v ./... -race -count=1
 
-pre-commit: test-all ## Checks everything is allright
+pre-commit: test-all clean ## Checks everything is allright
 	@echo "Commit Status: OK"
 
 ## Help:
