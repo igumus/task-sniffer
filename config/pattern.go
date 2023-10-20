@@ -8,6 +8,7 @@ import (
 type Pattern interface {
 	Name() string
 	Match(string) []string
+	String() string
 }
 
 type patternKind uint8
@@ -63,7 +64,11 @@ func (k *pattern) buildRegexString() string {
 		builder.WriteString(")([: ]*)*(.*)")
 		break
 	case exclusion:
-		builder.WriteString(strings.ReplaceAll(k.name, "*", "(.*)"))
+		value := k.name
+		value = strings.ReplaceAll(value, "?", "")
+		value = strings.ReplaceAll(value, ".", "\\.")
+		value = strings.ReplaceAll(value, "*", "(.*)")
+		builder.WriteString(value)
 		break
 	default:
 		panic("not reachable")
@@ -74,7 +79,17 @@ func (k *pattern) buildRegexString() string {
 }
 
 func (k *pattern) compile() {
-	k.compiled = regexp.MustCompile(k.buildRegexString())
+	regex := k.buildRegexString()
+	k.compiled = regexp.MustCompile(regex)
+}
+
+func (k *pattern) String() string {
+	switch k.kind {
+	case keyword:
+		return strings.Title(k.name)
+	default:
+		return k.name
+	}
 }
 
 func (k *pattern) Name() string {
