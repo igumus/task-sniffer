@@ -1,5 +1,10 @@
 package config
 
+import (
+	"path"
+	"path/filepath"
+)
+
 var (
 	keyword_todo     Pattern = newKeyword("todo")
 	keyword_fixme    Pattern = newKeyword("fixme")
@@ -24,13 +29,34 @@ type Config interface {
 	Keywords() []Pattern
 	Exclusions() []Pattern
 	Exclude(string)
+	Name() string
+	Path() string
 }
 
-func Load() Config {
-	return default_configuration
+func Load(location, branch string) (Config, error) {
+	ret := default_configuration
+	ret.path, _ = filepath.Abs(location)
+	var err error = nil
+	if err = checkRepository(ret.path); err != nil {
+		return nil, err
+	}
+	if ret.url, err = readRepositoryURL(ret.path, branch); err != nil {
+		return nil, err
+	}
+
+	exclusions := readRepositoryExclusions(ret.path)
+	if len(exclusions) > 0 {
+		for _, exclusion := range exclusions {
+			ret.exclusions = append(ret.exclusions, exclusion)
+		}
+	}
+
+	return ret, nil
 }
 
 type config struct {
+	path       string
+	url        string
 	keywords   []Pattern
 	exclusions []Pattern
 }
@@ -41,6 +67,14 @@ func (c *config) Keywords() []Pattern {
 
 func (c *config) Exclude(name string) {
 	c.exclusions = append(c.exclusions, newExclusion(name))
+}
+
+func (c *config) Path() string {
+	return c.path
+}
+
+func (c *config) Name() string {
+	return path.Base(c.path)
 }
 
 func (c *config) Exclusions() []Pattern {
