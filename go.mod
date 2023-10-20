@@ -1,10 +1,11 @@
-module github.com/igumus/todo-sniffer
+module github.com/igumus/task-sniffer
 
 go 1.21
 
 require (
 	github.com/rs/zerolog v1.31.0
 	github.com/stretchr/testify v1.8.4
+	gopkg.in/ini.v1 v1.67.0
 )
 
 require (
