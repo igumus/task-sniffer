@@ -36,7 +36,7 @@ func TestPatternRegexStringGeneration(t *testing.T) {
 		{
 			name:     ".gitignore",
 			kind:     exclusion,
-			expected: "^.gitignore$",
+			expected: "^\\.gitignore$",
 		},
 	}
 
