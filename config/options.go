@@ -2,7 +2,6 @@ package config
 
 import (
 	"path"
-	"path/filepath"
 )
 
 var (
@@ -35,7 +34,7 @@ type Config interface {
 
 func Load(location, branch string) (Config, error) {
 	ret := default_configuration
-	ret.path, _ = filepath.Abs(location)
+	ret.path = location
 	var err error = nil
 	if err = checkRepository(ret.path); err != nil {
 		return nil, err

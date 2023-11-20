@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
+	"path/filepath"
 
 	"github.com/igumus/task-sniffer/config"
 	"github.com/igumus/task-sniffer/project"
@@ -18,18 +20,23 @@ func main() {
 	flag.Parse()
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	if *debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
-	cfg, err := config.Load(*folder, *branch)
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+	path, err := filepath.Abs(*folder)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed")
+	} else {
+		log.Logger = log.Logger.With().Str("project", path).Logger()
+	}
+
+	cfg, err := config.Load(path, *branch)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed")
 	}
 
-	project := project.New(cfg)
-	if err := project.Tasks(); err != nil {
-		log.Fatal().Err(err)
-	}
+	project := project.New()
+	project.ListFiles(context.Background(), cfg)
 }
