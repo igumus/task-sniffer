@@ -2,7 +2,6 @@ package config
 
 import (
 	"path"
-	"path/filepath"
 )
 
 var (
@@ -31,11 +30,14 @@ type Config interface {
 	Exclude(string)
 	Name() string
 	Path() string
+	Addr() string
+	ShouldModify(bool)
+	Modify() bool
 }
 
 func Load(location, branch string) (Config, error) {
 	ret := default_configuration
-	ret.path, _ = filepath.Abs(location)
+	ret.path = location
 	var err error = nil
 	if err = checkRepository(ret.path); err != nil {
 		return nil, err
@@ -59,6 +61,7 @@ type config struct {
 	url        string
 	keywords   []Pattern
 	exclusions []Pattern
+	modify     bool
 }
 
 func (c *config) Keywords() []Pattern {
@@ -75,6 +78,18 @@ func (c *config) Path() string {
 
 func (c *config) Name() string {
 	return path.Base(c.path)
+}
+
+func (c *config) Addr() string {
+	return c.url
+}
+
+func (c *config) Modify() bool {
+	return c.modify
+}
+
+func (c *config) ShouldModify(t bool) {
+	c.modify = t
 }
 
 func (c *config) Exclusions() []Pattern {

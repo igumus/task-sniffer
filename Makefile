@@ -17,6 +17,9 @@ build: clean tidy ## Builds project
 	@go mod tidy
 	@GO111MODULE=on CGO_ENABLED=0 go build -ldflags="-w -s" -o ${PROJECT_BINARY_OUTPUT}/bin/${PROJECT_BINARY} main.go
 
+run: build ## Runs project with default params
+	@${PROJECT_BINARY_OUTPUT}/bin/${PROJECT_BINARY}
+
 test-clean: build 
 	@go clean -testcache
 
