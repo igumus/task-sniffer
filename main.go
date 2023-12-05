@@ -8,6 +8,7 @@ import (
 
 	"github.com/igumus/task-sniffer/config"
 	"github.com/igumus/task-sniffer/project"
+	"github.com/igumus/task-sniffer/reporter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -17,6 +18,7 @@ func main() {
 	folder := flag.String("path", ".", "folder to scan")
 	branch := flag.String("branch", "main", "folder to scan")
 	debug := flag.Bool("debug", false, "sets log level to debug")
+	reporterName := flag.String("reporter", "console", "[console]")
 	flag.Parse()
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -37,6 +39,20 @@ func main() {
 		log.Fatal().Err(err).Msg("failed")
 	}
 
-	project := project.New()
-	project.ListFiles(context.Background(), cfg)
+	var (
+		report    reporter.ReportFunc
+		reportErr error
+	)
+
+	if *reporterName == "console" {
+		report, reportErr = reporter.DefaultReporter(cfg)
+	} else {
+		log.Warn().Str("reporter", *reporterName).Msg("unknown reporter, fallback to default repoter")
+		report, reportErr = reporter.DefaultReporter(cfg)
+	}
+	if reportErr != nil {
+		log.Fatal().Err(reportErr).Msg("failed to create reporter")
+	}
+
+	project.Report(context.Background(), cfg, report)
 }
